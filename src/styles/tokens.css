@@ -1,0 +1,86 @@
+/* ── Design tokens ───────────────────────────────────────────────────────────
+   Dark is the primary surface. Light is a real second theme, not an inversion.
+   One electric accent (jade), one warm counterweight (amber), one alarm (coral).
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --void: #030806;
+  --bg: #05100b;
+  --bg-deep: #030907;
+  --panel: #0a1a13;
+  --panel-2: #0e2419;
+  --raised: #12291d;
+
+  /* Ink */
+  --ink: #e9f2ec;
+  --ink-soft: #b6c9bd;
+  --ink-mute: #7c9187;
+  --ink-faint: #5a6d63;
+
+  /* Accents */
+  --jade: #35e89b;
+  --jade-deep: #16a86b;
+  --jade-glow: rgba(53, 232, 155, 0.16);
+  --amber: #ffb454;
+  --coral: #ff5a45;
+  --violet: #b388ff;
+  --sky: #5ba8ff;
+
+  /* Lines */
+  --line: rgba(154, 200, 175, 0.14);
+  --line-soft: rgba(154, 200, 175, 0.08);
+  --line-strong: rgba(154, 200, 175, 0.26);
+
+  /* Type */
+  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --bangla: 'Hind Siliguri', var(--sans);
+
+  /* Rhythm */
+  --gutter: clamp(1.25rem, 4.5vw, 5.5rem);
+  --section: clamp(6rem, 14vh, 11rem);
+  --radius: 18px;
+  --radius-lg: 26px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur: 0.7s;
+
+  --shadow-lift: 0 30px 80px -40px rgba(0, 0, 0, 0.9), 0 2px 10px -4px rgba(0, 0, 0, 0.6);
+  --shadow-deep: 0 60px 140px -60px rgba(0, 0, 0, 1);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg: #f4f3ec;
+  --bg-deep: #eceade;
+  --panel: #ffffff;
+  --panel-2: #f9f8f1;
+  --raised: #ffffff;
+
+  --ink: #0d1a13;
+  --ink-soft: #3a4c42;
+  --ink-mute: #55665b;
+  --ink-faint: #78887b;
+
+  --jade: #0d7d51;
+  --jade-deep: #0a6742;
+  --jade-glow: rgba(13, 125, 81, 0.12);
+  --amber: #b4720a;
+  --coral: #cc3a26;
+  --violet: #6b45c9;
+  --sky: #2a6fbf;
+
+  --line: rgba(24, 46, 34, 0.14);
+  --line-soft: rgba(24, 46, 34, 0.07);
+  --line-strong: rgba(24, 46, 34, 0.28);
+
+  --shadow-lift: 0 24px 60px -34px rgba(20, 40, 30, 0.36), 0 2px 8px -4px rgba(20, 40, 30, 0.16);
+  --shadow-deep: 0 50px 110px -50px rgba(20, 40, 30, 0.42);
+}
