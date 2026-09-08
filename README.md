@@ -49,6 +49,24 @@ npm run build:mask         # land mask from Natural Earth
 npm run capture:projects   # screenshots from the live sites
 ```
 
+## Deploying
+
+Vercel detects Vite automatically — build `npm run build`, output `dist`. No
+rewrites are needed: the page has no client-side router, only hash anchors, so
+unknown paths should genuinely 404.
+
+Canonical and Open Graph tags need an absolute URL, which is only known at
+deploy time. A small Vite plugin stamps `__SITE_URL__` in `index.html` from,
+in order:
+
+1. `VITE_SITE_URL` — set this once a custom domain is attached
+2. `VERCEL_PROJECT_PRODUCTION_URL` — supplied by Vercel, used automatically
+3. `https://nafismomen.com` — the local fallback
+
+So a preview deploy is correct with no configuration, and attaching a domain is
+one environment variable. Re-run `npm run build:social` if the hero changes, so
+the share card matches.
+
 ## Performance
 
 three.js is code-split behind a lazy import, so the readable page ships in about
