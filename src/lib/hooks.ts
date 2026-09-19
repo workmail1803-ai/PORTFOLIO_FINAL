@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useReducedMotion() {
   const [reduced, setReduced] = useState(
@@ -13,109 +13,40 @@ export function useReducedMotion() {
   return reduced;
 }
 
-export type Theme = 'dark' | 'light';
-
-export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof localStorage !== 'undefined') {
-      const saved = localStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') return saved;
+/**
+ * The desk lamp. This replaces the old light/dark toggle: a night-room site
+ * does not turn into daytime, but the lamp can warm it up. Same `T` shortcut.
+ */
+export function useLamp() {
+  const [lamp, setLamp] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('lamp') === 'on';
+    } catch {
+      return false;
     }
-    return 'dark';
   });
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.lamp = lamp ? 'on' : 'off';
     try {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem('lamp', lamp ? 'on' : 'off');
     } catch {
-      /* storage can be unavailable; the theme still applies for this visit */
+      /* storage can be unavailable; the lamp still works for this visit */
     }
-  }, [theme]);
+  }, [lamp]);
 
-  return [theme, () => setTheme(t => (t === 'dark' ? 'light' : 'dark'))] as const;
+  const toggle = useCallback(() => setLamp(v => !v), []);
+  return [lamp, toggle] as const;
 }
 
-/**
- * The layout decides what the particle field draws and where.
- *
- * Elements marked `data-field="<shape>"` reserve real space in the document,
- * so whatever the field renders lands in a gap the page deliberately left for
- * it — it can never collide with text. The nearest slot to the middle of the
- * viewport wins.
- */
-export function useFieldSlots<T extends string>(initial: T) {
-  const shape = useRef<T>(initial);
-  /**
-   * The winning element itself, not a snapshot of its box. The renderer reads
-   * its rect on the frame it draws, so the field is glued to the layout — a
-   * cached-and-damped position lags behind the scroll and reads as the page
-   * drifting on its own.
-   */
-  const slotEl = useRef<HTMLElement | null>(null);
-  /** Where the field is travelling from, so the move can be animated. */
-  const prevSlotEl = useRef<HTMLElement | null>(null);
-  /** False in sections that deliberately have no shape — nothing is drawn. */
-  const active = useRef(true);
-  const progress = useRef(0);
-
+/** Sets the document title and description for the page on screen. */
+export function useTitle(title: string, description?: string) {
   useEffect(() => {
-    let frame = 0;
-
-    const measure = () => {
-      frame = 0;
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - window.innerHeight;
-      progress.current = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-
-      const eye = window.innerHeight / 2;
-
-      // Only a slot the middle of the screen is actually inside counts. There
-      // is no background state: sections that do not offer a slot show nothing
-      // at all, and the field simply waits where it was.
-      let inside: { el: HTMLElement; area: number } | null = null;
-
-      for (const el of document.querySelectorAll<HTMLElement>('[data-field]')) {
-        const rect = el.getBoundingClientRect();
-        if (!rect.width || !rect.height) continue;
-
-        // A shape is switched on by its section (`data-field-zone`) but drawn
-        // inside its own empty box. Without that split each emblem would only
-        // survive the few hundred pixels its box happens to occupy, and the
-        // dots would blink out between every project.
-        const zone = el.closest<HTMLElement>('[data-field-zone]') ?? el;
-        const band = zone === el ? rect : zone.getBoundingClientRect();
-        if (band.top > eye || band.bottom < eye) continue;
-
-        const area = band.width * band.height;
-        if (!inside || area < inside.area) inside = { el, area };
-      }
-
-      active.current = Boolean(inside);
-      if (!inside) return;
-
-      if (inside.el !== slotEl.current) {
-        prevSlotEl.current = slotEl.current ?? inside.el;
-        slotEl.current = inside.el;
-        shape.current = (inside.el.dataset.field as T) ?? initial;
-      }
-    };
-
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [initial]);
-
-  return { shape, slotEl, prevSlotEl, active, progress };
+    document.title = title;
+    if (description) {
+      document.querySelector('meta[name="description"]')?.setAttribute('content', description);
+    }
+  }, [title, description]);
 }
 
 /** Adds `is-in` once an element first enters the viewport. */

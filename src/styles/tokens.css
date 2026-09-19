@@ -1,86 +1,76 @@
-/* ── Design tokens ───────────────────────────────────────────────────────────
-   Dark is the primary surface. Light is a real second theme, not an inversion.
-   One electric accent (jade), one warm counterweight (amber), one alarm (coral).
+/* ── Tokens ──────────────────────────────────────────────────────────────────
+   A night room lit by a monitor: midnight surfaces, one electric blue that
+   does the work, violet as its shadow, and small cyan, pink and lamp-amber
+   moments. The "lamp" theme warms the room rather than turning it to day.
    ────────────────────────────────────────────────────────────────────────── */
 
 :root {
   color-scheme: dark;
 
-  /* Surfaces */
-  --void: #030806;
-  --bg: #05100b;
-  --bg-deep: #030907;
-  --panel: #0a1a13;
-  --panel-2: #0e2419;
-  --raised: #12291d;
+  /* Room */
+  --bg: #05071a;
+  --bg-deep: #03040f;
+  --bg-raise: #0a0e26;
+  --surface: rgba(20, 27, 64, 0.62);
+  --surface-2: rgba(28, 36, 84, 0.7);
+  --surface-solid: #111737;
 
   /* Ink */
-  --ink: #e9f2ec;
-  --ink-soft: #b6c9bd;
-  --ink-mute: #7c9187;
-  --ink-faint: #5a6d63;
+  --ink: #eef1ff;
+  --ink-soft: #c1c8ec;
+  --ink-mute: #939bc6;
+  --ink-faint: #6c749f;
 
-  /* Accents */
-  --jade: #35e89b;
-  --jade-deep: #16a86b;
-  --jade-glow: rgba(53, 232, 155, 0.16);
-  --amber: #ffb454;
-  --coral: #ff5a45;
-  --violet: #b388ff;
-  --sky: #5ba8ff;
+  /* Light */
+  --blue: #5b7cff;
+  --blue-hi: #7d97ff;
+  --blue-deep: #3450e8;
+  --violet: #9b7bff;
+  --cyan: #56dcff;
+  --pink: #ff7ac8;
+  --lamp: #ffb86b;
+  --live: #4fe3a4;
+
+  --glow-blue: 0 0 0 1px rgba(91, 124, 255, 0.55), 0 8px 30px -6px rgba(91, 124, 255, 0.65),
+    0 0 60px -12px rgba(125, 151, 255, 0.55);
+  --glow-soft: 0 0 0 1px rgba(125, 151, 255, 0.22), 0 18px 50px -24px rgba(91, 124, 255, 0.55);
 
   /* Lines */
-  --line: rgba(154, 200, 175, 0.14);
-  --line-soft: rgba(154, 200, 175, 0.08);
-  --line-strong: rgba(154, 200, 175, 0.26);
+  --line: rgba(150, 168, 255, 0.16);
+  --line-soft: rgba(150, 168, 255, 0.09);
+  --line-strong: rgba(150, 168, 255, 0.3);
 
   /* Type */
-  --display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --sans: 'Geist Variable', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
   --bangla: 'Hind Siliguri', var(--sans);
 
   /* Rhythm */
-  --gutter: clamp(1.25rem, 4.5vw, 5.5rem);
-  --section: clamp(6rem, 14vh, 11rem);
-  --radius: 18px;
-  --radius-lg: 26px;
+  --gutter: clamp(1.1rem, 4vw, 4.5rem);
+  --max: 1320px;
+  --section: clamp(4.5rem, 10vh, 8rem);
+  --r-sm: 12px;
+  --r: 18px;
+  --r-lg: 26px;
 
   /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur: 0.7s;
 
-  --shadow-lift: 0 30px 80px -40px rgba(0, 0, 0, 0.9), 0 2px 10px -4px rgba(0, 0, 0, 0.6);
-  --shadow-deep: 0 60px 140px -60px rgba(0, 0, 0, 1);
+  --shadow-card: 0 24px 60px -30px rgba(0, 0, 0, 0.85), 0 2px 10px -4px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 40px 90px -36px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(125, 151, 255, 0.25);
 }
 
-:root[data-theme='light'] {
-  color-scheme: light;
-
-  --bg: #f4f3ec;
-  --bg-deep: #eceade;
-  --panel: #ffffff;
-  --panel-2: #f9f8f1;
-  --raised: #ffffff;
-
-  --ink: #0d1a13;
-  --ink-soft: #3a4c42;
-  --ink-mute: #55665b;
-  --ink-faint: #78887b;
-
-  --jade: #0d7d51;
-  --jade-deep: #0a6742;
-  --jade-glow: rgba(13, 125, 81, 0.12);
-  --amber: #b4720a;
-  --coral: #cc3a26;
-  --violet: #6b45c9;
-  --sky: #2a6fbf;
-
-  --line: rgba(24, 46, 34, 0.14);
-  --line-soft: rgba(24, 46, 34, 0.07);
-  --line-strong: rgba(24, 46, 34, 0.28);
-
-  --shadow-lift: 0 24px 60px -34px rgba(20, 40, 30, 0.36), 0 2px 8px -4px rgba(20, 40, 30, 0.16);
-  --shadow-deep: 0 50px 110px -50px rgba(20, 40, 30, 0.42);
+/* The lamp: warmer light, a touch brighter. Same room. */
+:root[data-lamp='on'] {
+  --bg: #0b0816;
+  --bg-deep: #070510;
+  --bg-raise: #140f24;
+  --surface: rgba(38, 28, 60, 0.6);
+  --surface-2: rgba(52, 38, 78, 0.68);
+  --surface-solid: #1a1330;
+  --ink-soft: #d5cde6;
+  --ink-mute: #a79cbd;
 }

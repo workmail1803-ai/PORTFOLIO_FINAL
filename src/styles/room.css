@@ -1,0 +1,775 @@
+/* ── The room ───────────────────────────────────────────────────────────────
+   A painting of a night room, fixed behind every page and cropped like
+   object-fit: cover. Its life is small elements animating transform and
+   opacity only — compositor work, nothing that repaints while you scroll.
+   Positions are percentages of the painting; sizes are in --u, one pixel of
+   the painting at the current scale.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.room {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  /* The large viewport, so the scene does not rescale as a phone's address bar comes and goes. */
+  height: 100lvh;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg-deep);
+  container-type: size;
+}
+
+.scene {
+  --scene-w: max(100cqw, 177.872cqh); /* 1672 / 940 */
+  --scene-h: max(100cqh, 56.22cqw);
+  --u: calc(var(--scene-w) / 1672);
+  position: absolute;
+  width: var(--scene-w);
+  height: var(--scene-h);
+  left: calc((100cqw - var(--scene-w)) * var(--focus-x, 0.5));
+  top: calc((100cqh - var(--scene-h)) * var(--focus-y, 0.5));
+  background-size: cover;
+}
+
+/* Portrait screens see a slice of the painting: make it the skyline. */
+@media (max-aspect-ratio: 1/1) {
+  .scene {
+    --focus-x: 0.6;
+  }
+}
+/* Very wide screens crop the height instead: keep the sky. */
+@media (min-aspect-ratio: 21/9) {
+  .scene {
+    --focus-y: 0.42;
+  }
+}
+
+.scene-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease);
+}
+
+.scene-life {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease) 0.2s;
+}
+
+.scene[data-ready] .scene-img,
+.scene[data-ready] .scene-life {
+  opacity: 1;
+}
+
+.scene-life > *,
+.sky > * {
+  position: absolute;
+  display: block;
+}
+
+/* Keeps the words readable while leaving the room vivid at the edges. */
+.room-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 58% 62% at 42% 48%, rgba(4, 6, 20, 0.5), rgba(4, 6, 20, 0.26) 62%, rgba(4, 6, 20, 0.1) 100%),
+    linear-gradient(180deg, rgba(4, 6, 20, 0.42), rgba(4, 6, 20, 0) 16%, rgba(4, 6, 20, 0) 70%, rgba(4, 6, 20, 0.5));
+}
+
+/* The desk lamp, switched on: warm light spilling from the corner. */
+.room-warm {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease);
+  background:
+    radial-gradient(ellipse 55% 70% at 10% 26%, rgba(255, 176, 96, 0.3), rgba(255, 150, 80, 0.1) 45%, transparent 75%),
+    linear-gradient(rgba(255, 150, 90, 0.07), rgba(255, 150, 90, 0.07));
+}
+
+:root[data-lamp='on'] .room-warm {
+  opacity: 1;
+}
+
+/* ── The city ─────────────────────────────────────────────────────────────── */
+
+/* Each group animates as one layer; its lights are static inside it. */
+.twinkle {
+  position: absolute;
+  inset: 0;
+}
+
+.twinkle > i {
+  position: absolute;
+  display: block;
+}
+
+.stars {
+  opacity: 0.25;
+  animation: twinkle-star var(--d) ease-in-out var(--t) infinite alternate;
+}
+
+@keyframes twinkle-star {
+  to {
+    opacity: 1;
+  }
+}
+
+.star {
+  width: calc(var(--u) * var(--s));
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, rgba(205, 218, 255, 0.85) 22%, transparent 68%);
+}
+
+/* Lit windows flaring brighter for a moment. */
+.flares {
+  opacity: 0;
+  animation: flare var(--d) ease-in-out var(--t) infinite;
+}
+
+@keyframes flare {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  48%,
+  56% {
+    opacity: 0.95;
+  }
+}
+
+.lit {
+  width: calc(var(--u) * var(--s));
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--c) 18%, color-mix(in srgb, var(--c) 35%, transparent) 38%, transparent 70%);
+}
+
+/* Windows going dark, then lighting up again, the way real ones do: instantly. */
+.unlits {
+  opacity: 0;
+  animation: switch-off var(--d) linear var(--t) infinite;
+}
+
+@keyframes switch-off {
+  0%,
+  61.9% {
+    opacity: 0;
+  }
+  62%,
+  87.9% {
+    opacity: 1;
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.unlit {
+  background: var(--c);
+  border-radius: 1px;
+}
+
+/* Shooting stars and a plane, inside the big window's sky (a plain rectangle
+   below the slanted frame, clipped by overflow: cheap, unlike clip-path). */
+.sky {
+  overflow: hidden;
+}
+
+.shoot {
+  top: 12%;
+  left: 88%;
+  width: calc(var(--u) * 110);
+  height: calc(var(--u) * 1.6);
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(200, 215, 255, 0.5) 70%, #fff);
+  transform-origin: 100% 50%;
+  opacity: 0;
+  animation: shoot 17s linear 4s infinite;
+}
+
+.shoot.is-late {
+  top: 4%;
+  left: 62%;
+  width: calc(var(--u) * 80);
+  animation-duration: 29s;
+  animation-delay: 13s;
+}
+
+@keyframes shoot {
+  0% {
+    opacity: 0;
+    transform: rotate(157deg) translateX(0);
+  }
+  1% {
+    opacity: 1;
+  }
+  5% {
+    opacity: 0;
+    transform: rotate(157deg) translateX(calc(var(--u) * 300));
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(157deg) translateX(calc(var(--u) * 300));
+  }
+}
+
+.plane {
+  left: 0;
+  top: 22%;
+  width: 100%;
+  height: calc(var(--u) * 4);
+  animation: fly 52s linear 6s infinite both;
+}
+
+.plane i {
+  position: absolute;
+  left: 0;
+  width: calc(var(--u) * 3.6);
+  height: calc(var(--u) * 3.6);
+  border-radius: 50%;
+  background: #ff5d6c;
+  box-shadow:
+    0 0 calc(var(--u) * 4) rgba(255, 93, 108, 0.8),
+    calc(var(--u) * 6) 0 0 calc(var(--u) * -0.2) #fff,
+    calc(var(--u) * 6) 0 calc(var(--u) * 5) rgba(255, 255, 255, 0.7);
+  animation: strobe 1.3s steps(1) infinite;
+}
+
+@keyframes fly {
+  0% {
+    transform: translate(100%, 0);
+  }
+  62% {
+    transform: translate(-6%, calc(var(--u) * 14));
+  }
+  100% {
+    transform: translate(-6%, calc(var(--u) * 14));
+  }
+}
+
+@keyframes strobe {
+  0% {
+    opacity: 1;
+  }
+  12% {
+    opacity: 0.35;
+  }
+}
+
+/* ── The room itself ──────────────────────────────────────────────────────── */
+
+.neon-off,
+.neon-on {
+  pointer-events: none;
+}
+
+.neon-on {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+  animation: neon-buzz 3.1s ease-in-out infinite alternate;
+}
+
+/* Mostly steady; a buzz, then now and again the words drop out — the painted-
+   out sign fades in over the tubes while the glow above it goes dark. */
+.neon-off {
+  opacity: 0;
+  animation: neon-drop 11s linear 3s infinite;
+}
+
+.neon-glow {
+  animation: neon-glow-drop 11s linear 3s infinite;
+}
+
+@keyframes neon-buzz {
+  to {
+    opacity: 0.85;
+  }
+}
+
+@keyframes neon-drop {
+  0%,
+  90% {
+    opacity: 0;
+  }
+  90.5%,
+  91.5% {
+    opacity: 1;
+  }
+  92%,
+  93% {
+    opacity: 0;
+  }
+  93.5%,
+  96.5% {
+    opacity: 1;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes neon-glow-drop {
+  0%,
+  90% {
+    opacity: 1;
+  }
+  90.5%,
+  91.5% {
+    opacity: 0;
+  }
+  92%,
+  93% {
+    opacity: 1;
+  }
+  93.5%,
+  96.5% {
+    opacity: 0;
+  }
+  97%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.glow {
+  width: calc(var(--u) * var(--r) * 2);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 196, 120, 0.42), rgba(255, 160, 80, 0.14) 38%, transparent 68%);
+  animation: flicker var(--d) linear infinite;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  7% {
+    opacity: 0.72;
+  }
+  9% {
+    opacity: 0.95;
+  }
+  38% {
+    opacity: 0.8;
+  }
+  41% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0.76;
+  }
+  69% {
+    opacity: 0.93;
+  }
+}
+
+:root[data-lamp='on'] .glow-desk {
+  scale: 1.5;
+}
+
+.glow-desk {
+  transition: scale 0.6s var(--ease);
+}
+
+/* Somebody is typing on the monitor. */
+.screen {
+  overflow: hidden;
+}
+
+.screen i {
+  position: absolute;
+  left: calc(var(--u) * var(--in));
+  top: calc(var(--u) * (4 + var(--n) * 8.5));
+  width: calc(var(--u) * var(--len));
+  height: calc(var(--u) * 1.8);
+  /* Words, not bars: short runs with gaps, like code at a distance. */
+  background: repeating-linear-gradient(
+    90deg,
+    var(--c) 0 calc(var(--u) * 9),
+    transparent calc(var(--u) * 9) calc(var(--u) * 12),
+    var(--c) calc(var(--u) * 12) calc(var(--u) * 17),
+    transparent calc(var(--u) * 17) calc(var(--u) * 20)
+  );
+  transform-origin: 0 50%;
+  opacity: 0;
+  animation: type 12s steps(10, end) calc(var(--n) * 2.1s) infinite;
+}
+
+@keyframes type {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.6;
+  }
+  16% {
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+  80% {
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+  84%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+.steam i {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: calc(var(--u) * 15);
+  height: calc(var(--u) * 38);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(235, 238, 255, 0.5), transparent 70%);
+  opacity: 0;
+  animation: steam 5.2s ease-out infinite;
+}
+
+.steam i:nth-child(2) {
+  animation-delay: 1.7s;
+  --drift: -1;
+}
+
+.steam i:nth-child(3) {
+  animation-delay: 3.4s;
+  --drift: 0.6;
+}
+
+@keyframes steam {
+  0% {
+    transform: translate(-50%, 0) scale(0.5, 0.4);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--u) * 10 * var(--drift, 1)), calc(var(--u) * -52)) scale(1.4, 1.1);
+    opacity: 0;
+  }
+}
+
+.cat {
+  /* The flank rises from where it lies on the books. */
+  transform-origin: 62% 86%;
+  animation: breathe 3.9s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.012, 1.032);
+  }
+}
+
+.zzz i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-style: normal;
+  font-size: calc(var(--u) * 13);
+  line-height: 1;
+  color: rgba(214, 222, 255, 0.85);
+  opacity: 0;
+  animation: snooze 4.5s ease-out infinite;
+}
+
+.zzz i:nth-child(2) {
+  animation-delay: 1.5s;
+}
+
+.zzz i:nth-child(3) {
+  animation-delay: 3s;
+  font-size: calc(var(--u) * 17);
+}
+
+.zzz.is-awake i {
+  animation-play-state: paused;
+  visibility: hidden;
+}
+
+@keyframes snooze {
+  0% {
+    transform: translate(0, 0) rotate(-8deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(calc(var(--u) * -14), calc(var(--u) * -40)) rotate(6deg);
+    opacity: 0;
+  }
+}
+
+.mote {
+  width: calc(var(--u) * 3.2);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 160, 0.95), rgba(255, 190, 110, 0) 70%);
+  opacity: 0;
+  animation: drift var(--d) ease-in-out var(--t) infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(calc(var(--u) * var(--mx)), calc(var(--u) * var(--my)));
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0;
+  }
+}
+
+/* ── Touchable things ─────────────────────────────────────────────────────── */
+
+.scene-hot {
+  background: none;
+}
+
+.hot {
+  position: absolute;
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: none;
+  border-radius: calc(var(--u) * 8);
+  cursor: pointer;
+}
+
+.hot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at center, rgba(255, 210, 150, 0.16), transparent 72%);
+  box-shadow:
+    0 0 0 1px rgba(255, 214, 160, 0.4),
+    0 0 26px -4px rgba(255, 190, 120, 0.55);
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+
+.hot:hover::before {
+  opacity: 1;
+}
+
+/* The books are spines: a warm line of light along them rather than a box. */
+.hot-ideas::before,
+.hot-projects::before,
+.hot-skills::before,
+.hot-better::before {
+  border-radius: calc(var(--u) * 4);
+  transform: rotate(-3deg);
+}
+
+.hot-cat::before {
+  border-radius: 50%;
+  box-shadow: none;
+  background: radial-gradient(ellipse at center, rgba(255, 210, 150, 0.14), transparent 70%);
+}
+
+.hot-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  translate: -50% 4px;
+  padding: 0.18rem 0.6rem;
+  border-radius: 99px;
+  background: rgba(10, 13, 34, 0.85);
+  box-shadow: 0 0 0 1px rgba(255, 214, 160, 0.35);
+  color: #ffe2bd;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.2s var(--ease),
+    translate 0.2s var(--ease);
+}
+
+.hot:hover .hot-tip {
+  opacity: 1;
+  translate: -50% 0;
+}
+
+/* Tips near the painting's edge open inward. */
+.hot-monitor .hot-tip,
+.hot-ideas .hot-tip,
+.hot-projects .hot-tip,
+.hot-skills .hot-tip,
+.hot-better .hot-tip,
+.hot-lamp .hot-tip {
+  left: 0;
+  translate: 0 4px;
+}
+.hot-monitor:hover .hot-tip,
+.hot-ideas:hover .hot-tip,
+.hot-projects:hover .hot-tip,
+.hot-skills:hover .hot-tip,
+.hot-better:hover .hot-tip,
+.hot-lamp:hover .hot-tip {
+  translate: 0 0;
+}
+.hot-poster .hot-tip {
+  left: auto;
+  right: 0;
+  translate: 0 4px;
+}
+.hot-poster:hover .hot-tip {
+  translate: 0 0;
+}
+
+.cat-bubble {
+  position: absolute;
+  translate: -100% -100%;
+  padding: 0.3rem 0.75rem;
+  border-radius: 14px 14px 4px 14px;
+  background: #f4f1ff;
+  color: #1b1f3d;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  scale: 0.8;
+  transform-origin: 100% 100%;
+  transition:
+    opacity 0.2s var(--ease),
+    scale 0.25s var(--ease-spring);
+}
+
+.cat-bubble.is-on {
+  opacity: 1;
+  scale: 1;
+}
+
+/* ── Corners of the room ──────────────────────────────────────────────────
+   Each page rests on a corner of the painting; the camera glides between
+   them on a sub-second clip. The painting stays underneath throughout. */
+.corner-still,
+.scene-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.corner-still {
+  transition: opacity 0.5s var(--ease);
+}
+
+.scene-video {
+  transition: opacity 0.12s linear;
+}
+
+.corner-still.is-on,
+.scene-video.is-on {
+  opacity: 1;
+}
+
+/* The painting's own life and its touchable things belong to the whole room. */
+.room.is-away .scene-life {
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+
+.room.is-away .scene-hot {
+  display: none;
+}
+
+/* ── Reading over the room ────────────────────────────────────────────────
+   Words that sit straight on the painting get a soft shadow of the room's own
+   night, so a lit window behind a line never takes a letter with it. Static,
+   so it is painted once. Gradient text is excluded: with transparent glyphs a
+   shadow would show through the letters. */
+main :is(h1, h2, h3, p, li, dt, dd, figcaption, blockquote) {
+  text-shadow:
+    0 1px 2px rgba(4, 6, 20, 0.5),
+    0 0 22px rgba(4, 6, 20, 0.55);
+}
+main .grad {
+  text-shadow: none;
+}
+
+/* On a phone the text runs the full width of the skyline. */
+@media (max-width: 760px) {
+  .room-scrim {
+    background:
+      linear-gradient(180deg, rgba(4, 6, 20, 0.5), rgba(4, 6, 20, 0.38) 30%, rgba(4, 6, 20, 0.42) 70%, rgba(4, 6, 20, 0.6));
+  }
+}
+
+/* Nothing to touch without a mouse — and on a phone none of it is in view. */
+@media (hover: none), (max-width: 860px) {
+  .scene-hot {
+    display: none;
+  }
+}
+
+/* A phone sees the skyline; the rest of the room is off-screen. Keep it light. */
+@media (max-width: 760px) {
+  .is-minor,
+  .mote,
+  .steam,
+  .screen,
+  .zzz {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-life *,
+  .scene-life *::before {
+    animation: none !important;
+  }
+  .flares,
+  .unlits,
+  .shoot,
+  .plane,
+  .steam,
+  .zzz,
+  .mote {
+    display: none;
+  }
+  .stars {
+    opacity: 0.6;
+  }
+  .neon-on {
+    opacity: 0.7;
+  }
+}
+
+@media print {
+  .room {
+    display: none;
+  }
+}

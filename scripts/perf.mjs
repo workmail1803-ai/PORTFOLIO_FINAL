@@ -9,9 +9,16 @@ const base = process.env.SHOT_URL || 'http://127.0.0.1:5173';
 const browser = await chromium.launch({
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+const [vw, vh] = (process.env.PERF_VIEW || '1440x900').split('x').map(Number);
+const page = await browser.newPage({ viewport: { width: vw, height: vh } });
 await page.goto(base, { waitUntil: 'networkidle', timeout: 60000 });
 await page.evaluate(() => document.fonts.ready);
+if (process.env.PERF_CSS) await page.addStyleTag({ content: process.env.PERF_CSS });
+// PERF_THROTTLE=4 slows the CPU fourfold, roughly a budget phone.
+if (process.env.PERF_THROTTLE) {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.PERF_THROTTLE) });
+}
 await page.waitForTimeout(3000);
 
 const result = await page.evaluate(async () => {

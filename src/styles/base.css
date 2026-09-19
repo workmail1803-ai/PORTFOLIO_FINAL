@@ -10,32 +10,39 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-behavior: auto;
+  background: var(--bg);
 }
 
 body {
+  min-height: 100svh;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  font-size: clamp(1rem, 0.94rem + 0.28vw, 1.1rem);
+  font-size: clamp(0.98rem, 0.93rem + 0.22vw, 1.06rem);
   line-height: 1.62;
-  font-synthesis-weight: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
-  transition: background 0.6s var(--ease), color 0.6s var(--ease);
 }
 
 img,
 picture,
-canvas,
-svg {
+svg,
+canvas {
   display: block;
   max-width: 100%;
 }
 
+/* The width/height attributes (kept for layout stability) otherwise become a
+   fixed CSS height the moment a rule overrides only the width. */
+img {
+  height: auto;
+}
+
 button,
-input {
+input,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
@@ -43,8 +50,8 @@ input {
 button {
   background: none;
   border: 0;
-  cursor: pointer;
   padding: 0;
+  cursor: pointer;
 }
 
 a {
@@ -52,55 +59,86 @@ a {
   text-decoration: none;
 }
 
-ul {
+ul,
+ol {
   list-style: none;
   padding: 0;
 }
 
 :focus-visible {
-  outline: 2px solid var(--jade);
+  outline: 2px solid var(--cyan);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 ::selection {
-  background: var(--jade);
-  color: #04140c;
+  background: var(--blue);
+  color: #fff;
 }
 
-/* ── Type scale ──────────────────────────────────────────────────────────── */
+/* ── Type ─────────────────────────────────────────────────────────────────── */
 
-.display {
-  font-family: var(--display);
-  font-weight: 400;
-  line-height: 0.9;
-  letter-spacing: -0.025em;
+.h-display {
+  font-weight: 800;
+  font-size: clamp(3.1rem, 2rem + 5.4vw, 6.4rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.h-1 {
+  font-weight: 750;
+  font-size: clamp(2.3rem, 1.6rem + 3.2vw, 4.3rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
-.d1 {
-  font-size: clamp(3rem, 7.6vw, 8.4rem);
+.h-2 {
+  font-weight: 700;
+  font-size: clamp(1.7rem, 1.3rem + 1.7vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
-.d2 {
-  font-size: clamp(2.5rem, 6vw, 5.4rem);
+.h-3 {
+  font-weight: 650;
+  font-size: clamp(1.15rem, 1.05rem + 0.4vw, 1.35rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
 }
 
-.d3 {
-  font-size: clamp(2rem, 4.6vw, 3.9rem);
+.lede {
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.24rem);
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-wrap: pretty;
 }
 
-.italic {
-  font-style: italic;
+.muted {
+  color: var(--ink-mute);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue-hi);
 }
 
 .mono {
   font-family: var(--mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-mute);
-  font-weight: 400;
+}
+
+.hand {
+  font-family: var(--hand);
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .bn {
@@ -108,11 +146,11 @@ ul {
   letter-spacing: 0;
 }
 
-.lede {
-  font-size: clamp(1.1rem, 0.98rem + 0.6vw, 1.5rem);
-  line-height: 1.5;
-  color: var(--ink-soft);
-  text-wrap: pretty;
+.grad {
+  background: linear-gradient(100deg, var(--blue-hi) 10%, var(--violet) 70%, var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .sr-only {
@@ -130,13 +168,12 @@ ul {
   position: fixed;
   top: 0.75rem;
   left: 0.75rem;
-  z-index: 200;
+  z-index: 500;
   padding: 0.7rem 1.1rem;
-  background: var(--jade);
-  color: #04140c;
+  background: var(--blue);
+  color: #fff;
   border-radius: 999px;
   font-weight: 600;
-  font-size: 0.85rem;
   transform: translateY(-160%);
   transition: transform 0.3s var(--ease);
 }

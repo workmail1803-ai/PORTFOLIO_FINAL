@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ElementType, type ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode } from 'react';
 import { useReveal } from '../lib/hooks';
 
 /** Fades and lifts its children the first time they scroll into view. */
@@ -7,11 +7,13 @@ export function Reveal({
   as: Tag = 'div',
   delay = 0,
   className = '',
+  style,
 }: {
   children: ReactNode;
   as?: ElementType;
   delay?: number;
   className?: string;
+  style?: CSSProperties;
 }) {
   const [ref, shown] = useReveal<HTMLDivElement>();
   const Element = Tag as 'div';
@@ -19,7 +21,7 @@ export function Reveal({
     <Element
       ref={ref}
       className={`reveal ${shown ? 'is-in' : ''} ${className}`.trim()}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{ ...style, transitionDelay: `${delay}ms` }}
     >
       {children}
     </Element>

@@ -24,6 +24,11 @@ function stampSiteUrl(): Plugin {
 
 export default defineConfig({
   plugins: [react(), stampSiteUrl()],
+  build: {
+    // three.js lives in its own chunk, loaded only when the Playground opens;
+    // every other page ships without it.
+    chunkSizeWarningLimit: 1000,
+  },
   server: {
     host: '127.0.0.1',
     port: Number(process.env.PORT) || 5173,

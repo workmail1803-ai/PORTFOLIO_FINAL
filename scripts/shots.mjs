@@ -1,67 +1,65 @@
 /**
- * Design-review screenshots. Renders the running dev server at real viewport
- * sizes and writes them to artifacts/ so the layout can be judged honestly.
+ * Design-review screenshots of every route at real viewport sizes.
+ *   node scripts/shots.mjs [desktop|mobile] [route-filter]
  */
 import { chromium } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 
 const base = process.env.SHOT_URL || 'http://127.0.0.1:5173';
-const only = process.argv[2];
+const [, , onlyView, onlyRoute] = process.argv;
+await mkdir('artifacts/pages', { recursive: true });
 
-await mkdir('artifacts', { recursive: true });
-
-const browser = await chromium.launch({
-  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
-});
+const ROUTES = [
+  ['home', '/'],
+  ['about', '/about'],
+  ['projects', '/projects'],
+  ['case', '/projects/nextup'],
+  ['skills', '/skills'],
+  ['build', '/build-log'],
+  ['lab', '/lab'],
+  ['education', '/education'],
+  ['resume', '/resume'],
+  ['playground', '/playground'],
+  ['contact', '/contact'],
+  ['404', '/definitely-not-a-page'],
+];
 
 const VIEWS = [
   ['desktop', 1440, 900],
   ['mobile', 390, 844],
 ];
 
-/** [name, css selector, extra scroll in viewport heights] */
-const STOPS = [
-  ['hero', null, 0],
-  ['wall', '#wall', 0],
-  ['case-1', '#work', 0.9],
-  ['case-2', '#work', 2.2],
-  ['ledger', '#work', 4.4],
-  ['method', '#method', 0],
-  ['about', '#about', 0],
-  ['contact', '#contact', 0],
-];
+const browser = await chromium.launch({
+  args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+});
 
 try {
-  for (const [label, width, height] of VIEWS) {
-    if (only && only !== label) continue;
-    const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: 1 });
+  for (const [view, width, height] of VIEWS) {
+    if (onlyView && onlyView !== view) continue;
+    const page = await browser.newPage({ viewport: { width, height } });
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
     page.on('console', m => m.type() === 'error' && errors.push(m.text()));
 
-    await page.goto(base, { waitUntil: 'networkidle', timeout: 60000 });
-    await page.evaluate(() => document.fonts.ready);
-    await page.waitForTimeout(3500); // let the field assemble
-
-    for (const [name, selector, offset] of STOPS) {
-      await page.evaluate(
-        ([sel, off]) => {
-          const target = sel ? document.querySelector(sel) : null;
-          const base = target ? target.getBoundingClientRect().top + window.scrollY : 0;
-          window.scrollTo({ top: base + off * window.innerHeight, behavior: 'instant' });
-        },
-        [selector, offset],
-      );
-      await page.waitForTimeout(1600);
-      await page.screenshot({ path: `artifacts/${label}-${name}.png` });
+    for (const [name, path] of ROUTES) {
+      if (onlyRoute && !name.includes(onlyRoute)) continue;
+      await page.goto(base + path, { waitUntil: 'networkidle', timeout: 60000 });
+      await page.evaluate(() => document.fonts.ready);
+      await page.waitForTimeout(name === 'playground' ? 3500 : 1200);
+      await page.screenshot({ path: `artifacts/pages/${view}-${name}.png` });
+      // Scroll through once so reveal-on-scroll content is in its final state.
+      await page.evaluate(async () => {
+        for (let y = 0; y < document.body.scrollHeight; y += 500) {
+          window.scrollTo(0, y);
+          await new Promise(r => setTimeout(r, 60));
+        }
+        window.scrollTo(0, 0);
+      });
+      await page.waitForTimeout(700);
+      await page.screenshot({ path: `artifacts/pages/${view}-${name}-full.png`, fullPage: true });
     }
-
-    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForTimeout(1200);
-    await page.screenshot({ path: `artifacts/${label}-full.png`, fullPage: true });
-
-    console.log(`${label}: ${errors.length ? `⚠ ${errors.length} error(s)` : 'clean'}`);
-    for (const error of errors.slice(0, 5)) console.log(`   ${error}`);
+    console.log(`${view}: ${errors.length ? `${errors.length} error(s)` : 'clean'}`);
+    for (const error of [...new Set(errors)].slice(0, 6)) console.log(`   ${error.slice(0, 200)}`);
     await page.close();
   }
 } finally {

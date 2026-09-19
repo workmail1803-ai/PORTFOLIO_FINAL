@@ -321,21 +321,21 @@ export type FieldBuffers = {
 };
 
 const PALETTE: Array<[number, number, number]> = [
-  [0.208, 0.909, 0.608],
-  [0.914, 0.953, 0.925],
-  [1.0, 0.706, 0.329],
-  [0.702, 0.533, 1.0],
-  [0.357, 0.658, 1.0],
+  [0.357, 0.486, 1.0], // electric blue
+  [0.93, 0.945, 1.0], // near-white
+  [0.607, 0.482, 1.0], // violet
+  [0.337, 0.863, 1.0], // cyan
+  [1.0, 0.478, 0.784], // pink
 ];
 
 /** Per-shape accent, mixed over each particle's own tint. */
 export const SHAPE_COLOR: Record<ShapeId, [number, number, number]> = {
-  globe: [0.208, 0.909, 0.608],
-  songbad: [1.0, 0.42, 0.32],
-  plane: [0.208, 0.909, 0.608],
-  telegram: [0.357, 0.658, 1.0],
-  graph: [0.702, 0.533, 1.0],
-  envelope: [0.208, 0.909, 0.608],
+  globe: [0.42, 0.56, 1.0],
+  songbad: [1.0, 0.45, 0.6],
+  plane: [0.337, 0.863, 1.0],
+  telegram: [0.36, 0.66, 1.0],
+  graph: [0.607, 0.482, 1.0],
+  envelope: [0.49, 0.59, 1.0],
 };
 
 /** How much of the field to show for each shape. */

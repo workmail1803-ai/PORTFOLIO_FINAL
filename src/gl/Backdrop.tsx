@@ -47,18 +47,13 @@ function Stage({
 
     const place = (el: HTMLElement) => {
       const box = el.getBoundingClientRect();
-
-      // Size is capped so a tall rail does not produce a giant emblem.
-      const px = Math.min(box.width, box.height, size.height * 0.36);
+      const px = Math.min(box.width, box.height) * 0.9;
       const half = px / 2;
 
-      // Held at the middle of the screen while its box allows it, so the
-      // emblem reads as perfectly still while the page scrolls past.
-      const centreY = MathUtils.clamp(
-        size.height / 2,
-        Math.min(box.top + half, box.bottom - half),
-        Math.max(box.top + half, box.bottom - half),
-      );
+      // The box's own centre — but kept on screen if the box is part-scrolled.
+      const lo = Math.max(box.top + half, half + 8);
+      const hi = Math.min(box.bottom - half, size.height - half - 8);
+      const centreY = MathUtils.clamp(box.top + box.height / 2, Math.min(lo, hi), Math.max(lo, hi));
 
       return {
         x: ((box.left + box.width / 2) / size.width - 0.5) * visibleW,

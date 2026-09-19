@@ -76,8 +76,10 @@ const vertex = /* glsl */ `
       sin(t * 1.1 + pos.z * 1.3)
     ) * mix(0.0, 0.005, globeness) * (1.0 - arc);
 
+    // The fly-in assembles around the shape itself; a wide scatter would spray
+    // dots across the rest of the page while the field boots.
     vec3 scattered = normalize(pos + vec3(aSeed - 0.5, aSeed * 0.7 - 0.35, 0.5 - aSeed))
-      * (2.8 + aSeed * 5.4);
+      * (1.9 + aSeed * 1.3);
     float boot = clamp(uBoot * 1.4 - aSeed * 0.4, 0.0, 1.0);
     boot = boot * boot * (3.0 - 2.0 * boot);
     pos = mix(scattered, pos, boot);

@@ -131,7 +131,7 @@ export function Arcs({
             uTime: { value: 0 },
             uOffset: { value: index / routes.length },
             uFade: { value: 0 },
-            uColor: { value: [0.208, 0.909, 0.608] },
+            uColor: { value: [0.337, 0.863, 1.0] },
           },
           transparent: true,
           depthWrite: false,

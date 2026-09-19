@@ -1,0 +1,355 @@
+/* ── Characters ──────────────────────────────────────────────────────────────
+   Three transform layers, so behaviours never overwrite each other:
+     .char-lean   follows the cursor (JS writes --lx / --ly)
+     .char-idle   breathes or sways on its own
+     img / state  poses driven by interaction
+   ────────────────────────────────────────────────────────────────────────── */
+
+.char {
+  position: relative;
+  width: var(--char-w, 100%);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.char img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.char-lean {
+  transform: translate3d(calc(var(--lx, 0) * 7px), calc(var(--ly, 0) * 4px), 0)
+    rotate(calc(var(--lx, 0) * 1.2deg));
+  transform-origin: 50% 100%;
+  transition: transform 1s var(--ease);
+  will-change: transform;
+}
+
+.char-breathe .char-idle {
+  transform-origin: 50% 100%;
+  animation: breathe 5.8s var(--ease-in-out) infinite;
+}
+
+.char-sway .char-idle {
+  transform-origin: 50% 100%;
+  animation: sway 7.5s var(--ease-in-out) infinite;
+}
+
+.is-flipped img {
+  transform: scaleX(-1);
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-1.5px) scale(1.004, 1.012);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-0.7deg);
+  }
+  50% {
+    transform: rotate(0.7deg) translateY(-2px);
+  }
+}
+
+/* ── The tap: boy + real link ─────────────────────────────────────────────── */
+
+.tap {
+  position: relative;
+  width: 100%;
+}
+
+.tap-boy {
+  position: relative;
+  width: var(--tap-w, 76%);
+  margin-left: auto;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+}
+
+.tap-body {
+  position: relative;
+  transform-origin: 85% 100%;
+  transition: transform 0.55s var(--ease);
+}
+
+.tap-body img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tap-hand {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.45s var(--ease);
+  will-change: transform;
+}
+
+/* idle: the finger hovers just above the button */
+.tap[data-state='idle'] .tap-hand {
+  animation: finger-hover 3.4s var(--ease-in-out) infinite;
+}
+
+.tap[data-state='near'] .tap-body {
+  transform: translate(-5px, 2px) rotate(-0.9deg);
+}
+.tap[data-state='near'] .tap-hand {
+  transform: rotate(1.2deg);
+}
+
+.tap[data-state='hover'] .tap-body {
+  transform: translate(-8px, 4px) rotate(-1.5deg);
+}
+.tap[data-state='hover'] .tap-hand {
+  transform: rotate(0deg);
+}
+
+.tap[data-state='press'] .tap-body {
+  transform: translate(-9px, 6px) rotate(-1.7deg);
+  transition-duration: 0.18s;
+}
+.tap[data-state='press'] .tap-hand {
+  transform: rotate(-2.6deg) translateY(2px);
+  transition-duration: 0.14s;
+}
+
+@keyframes finger-hover {
+  0%,
+  100% {
+    transform: rotate(2.6deg);
+  }
+  50% {
+    transform: rotate(3.5deg);
+  }
+}
+
+.tap-button {
+  position: absolute;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.tap[data-state='near'] .tap-button {
+  box-shadow: var(--glow-soft), 0 10px 26px -10px rgba(91, 124, 255, 0.7);
+}
+
+.tap[data-state='hover'] .tap-button {
+  box-shadow: var(--glow-blue);
+  transform: translateY(-1px);
+}
+
+.tap[data-state='press'] .tap-button {
+  transform: translateY(3px) scale(0.965);
+  box-shadow: 0 0 0 1px rgba(125, 151, 255, 0.8), 0 0 40px -4px rgba(125, 151, 255, 0.9);
+  transition-duration: 0.12s;
+}
+
+/* ── The press: girl behind a pill ────────────────────────────────────────── */
+
+.press {
+  position: relative;
+  margin-inline: auto;
+}
+
+.press-girl {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+  user-select: none;
+  transition: transform 0.45s var(--ease);
+  will-change: transform;
+}
+
+.press[data-state='idle'] .press-girl {
+  animation: girl-hover 3.8s var(--ease-in-out) infinite;
+}
+.press[data-state='hover'] .press-girl {
+  transform: translateY(-1px);
+}
+.press[data-state='press'] .press-girl {
+  transform: translateY(5px);
+  transition-duration: 0.14s;
+}
+
+@keyframes girl-hover {
+  0%,
+  100% {
+    transform: translateY(-5px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.press-button {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding-top: 4%;
+  border-radius: 999px;
+  color: #11163a;
+  font-weight: 700;
+  font-size: clamp(1rem, 0.8rem + 0.9vw, 1.35rem);
+  letter-spacing: -0.02em;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #ffffff 0%, #eef1ff 55%, #d9deff 100%);
+  box-shadow:
+    inset 0 -6px 14px -6px rgba(91, 124, 255, 0.35),
+    0 0 0 3px rgba(91, 124, 255, 0.85),
+    0 0 0 6px rgba(91, 124, 255, 0.18),
+    0 14px 40px -10px rgba(91, 124, 255, 0.75);
+  overflow: hidden;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+
+.press[data-state='hover'] .press-button {
+  box-shadow:
+    inset 0 -6px 14px -6px rgba(91, 124, 255, 0.4),
+    0 0 0 3px rgba(125, 151, 255, 1),
+    0 0 0 8px rgba(125, 151, 255, 0.25),
+    0 18px 50px -8px rgba(125, 151, 255, 0.95);
+}
+
+.press[data-state='press'] .press-button {
+  transform: translateY(4px) scale(0.975);
+  transition-duration: 0.12s;
+}
+
+/* ── Sitting on a card ────────────────────────────────────────────────────── */
+
+.sit {
+  position: relative;
+}
+
+.sit-boy {
+  position: absolute;
+  top: 0;
+  right: 5%;
+  width: var(--sit-w);
+  z-index: 3;
+  pointer-events: none;
+  transform: translateY(calc(var(--seat) * -100%));
+}
+
+/* ── Peeking over an edge ─────────────────────────────────────────────────── */
+
+.peek {
+  position: absolute;
+  bottom: 100%;
+  width: var(--peek-w);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.peek .char {
+  transform: translateY(7%);
+  transition: transform 0.7s var(--ease);
+}
+
+.peek-host:hover .peek .char,
+.peek-host:focus-within .peek .char {
+  transform: translateY(0);
+}
+
+/* ── Notes ────────────────────────────────────────────────────────────────── */
+
+.note {
+  display: inline-block;
+  font-size: clamp(1.15rem, 1rem + 0.7vw, 1.65rem);
+  line-height: 1;
+  color: var(--ink-soft);
+  transform: rotate(var(--tilt));
+  pointer-events: none;
+}
+
+/* ── Burst: ripple + sparks ───────────────────────────────────────────────── */
+
+.burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.burst-ring {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--burst);
+  box-shadow: 0 0 14px var(--burst);
+  animation: burst-ring 0.62s var(--ease) forwards;
+}
+
+.burst-ring.is-late {
+  opacity: 0;
+  animation-delay: 0.1s;
+}
+
+.burst-spark {
+  position: absolute;
+  left: -1px;
+  top: -6px;
+  width: 2.5px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--burst);
+  box-shadow: 0 0 8px var(--burst);
+  animation: burst-spark 0.58s var(--ease) forwards;
+}
+
+@keyframes burst-ring {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+@keyframes burst-spark {
+  from {
+    transform: rotate(var(--a)) translateY(-6px) scaleY(0.4);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scaleY(1);
+    opacity: 0;
+  }
+}
+
+/* ── Reduced motion: characters hold still, interactions stay legible ─────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .char-lean,
+  .char-idle,
+  .tap-body,
+  .tap-hand,
+  .press-girl {
+    animation: none !important;
+    transform: none !important;
+  }
+}

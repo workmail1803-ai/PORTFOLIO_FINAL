@@ -4,3 +4,6 @@ dist/
 !.env.example
 artifacts/
 .DS_Store
+# Raw generated artwork (optimised copies live in public/)
+design-src/
+*.zip

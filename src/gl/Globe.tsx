@@ -32,8 +32,8 @@ const fragment = /* glsl */ `
     float facing = max(0.0, dot(normalize(vNormal), normalize(vView)));
     float rim = pow(1.0 - facing, 3.4);
 
-    vec3 darkCore = vec3(0.016, 0.055, 0.036);
-    vec3 darkRim  = vec3(0.055, 0.30, 0.20);
+    vec3 darkCore = vec3(0.02, 0.028, 0.1);
+    vec3 darkRim  = vec3(0.16, 0.24, 0.72);
     vec3 lightCore = vec3(0.945, 0.941, 0.918);
     vec3 lightRim  = vec3(0.78, 0.82, 0.78);
 

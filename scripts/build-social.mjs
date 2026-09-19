@@ -14,14 +14,14 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 2 });
 await page.goto(base, { waitUntil: 'networkidle', timeout: 60000 });
 await page.evaluate(() => document.fonts.ready);
-await page.waitForTimeout(4000);
+await page.waitForTimeout(2500);
 
-// Hide the fixed chrome so the card is just the statement and the globe.
-await page.addStyleTag({ content: '.bar, .curtain, .cursor-dot, .cursor-ring { display: none !important }' });
+// The card is the hero as a visitor first sees it, minus the cursor light.
+await page.addStyleTag({ content: '.cursor-glow { display: none !important }' });
 await page.waitForTimeout(400);
 
 const shot = await page.screenshot();
-await sharp(shot).resize(1200, 630).png({ compressionLevel: 9 }).toFile('public/images/social.png');
+await sharp(shot).resize(1200, 630).png({ palette: true, quality: 90, compressionLevel: 9 }).toFile('public/images/social.png');
 console.log('social.png — 1200x630');
 
 await browser.close();

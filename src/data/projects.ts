@@ -1,7 +1,9 @@
 /**
  * Every figure in this file is taken from the repository it describes — commit
- * counts from `git rev-list`, table and policy counts from the migrations,
- * timings from the project's own measured build. Nothing here is decoration.
+ * counts from `git rev-list --count HEAD`, file counts from `git ls-files`,
+ * `started`/`updated` from the first and latest commit dates on HEAD, table and
+ * policy counts from the migrations, timings from the project's own measured
+ * build. Nothing here is decoration. Re-verified 2026-09-19.
  */
 
 export type Status = 'live' | 'shipped' | 'research' | 'prototype';
@@ -32,6 +34,10 @@ export type Project = {
   accent: string;
   commits: number;
   files: number;
+  /** First commit on HEAD, YYYY-MM-DD. */
+  started: string;
+  /** Latest commit on HEAD, YYYY-MM-DD. */
+  updated: string;
 };
 
 export const projects: Project[] = [
@@ -41,7 +47,7 @@ export const projects: Project[] = [
     nameBn: 'সকল পত্রিকার মিলিত স্থান',
     tagline: 'Every Bangla newspaper. One tap. Ten milliseconds.',
     summary:
-      'A complete directory of Bangla media — national dailies, online portals, TV and FM channels, ePapers, government sites and job boards — organised across 19 categories and all 8 divisions, and served as static HTML so a page never makes you wait.',
+      'A complete directory of Bangla media (national dailies, online portals, TV and FM channels, ePapers, government sites and job boards), organised across 19 categories and all 8 divisions, and served as static HTML so a page never makes you wait.',
     status: 'live',
     year: '2026',
     kind: 'Directory',
@@ -54,13 +60,13 @@ export const projects: Project[] = [
       { value: '19', label: 'categories' },
     ],
     highlights: [
-      'Every public route pre-rendered with ISR — home, 19 categories, 8 divisions and 158 outlet pages ship as static HTML.',
+      'Every public route pre-rendered with ISR: home, 19 categories, 8 divisions and 158 outlet pages ship as static HTML.',
       'Outlets open in an on-site viewer so the reader never gets bounced to a third party; sites that refuse embedding flip to a one-click direct open.',
       'A Bangla converter that runs entirely in the browser: phonetic English→বাংলা typing, Bijoy ⇌ Unicode, and English ⇌ Bangla digits.',
       'A password-gated admin for outlets, categories, submissions, blog posts and logo uploads, with live click analytics.',
     ],
     craft:
-      'The outlet viewer originally made a database round-trip per request and took 478 ms. Moving it to fully pre-rendered SSG brought it to ~16 ms — about a 30× speed-up — and click counting moved to a fire-and-forget browser beacon so measurement never blocks a render. Reads go through a `React.cache()` de-duped query layer with a bundled dataset as fallback, which means the site still boots and serves all 158 outlets with no database attached at all.',
+      'The outlet viewer originally made a database round-trip per request and took 478 ms. Moving it to fully pre-rendered SSG brought it to ~16 ms (about a 30× speed-up), and click counting moved to a fire-and-forget browser beacon so measurement never blocks a render. Reads go through a `React.cache()` de-duped query layer with a bundled dataset as fallback, which means the site still boots and serves all 158 outlets with no database attached at all.',
     honest:
       'Timings are measured against a local production build (`next start`), not a synthetic benchmark. Traffic and revenue figures are not claimed.',
     live: 'https://www.allbanglapaper.com',
@@ -72,13 +78,15 @@ export const projects: Project[] = [
     accent: '#FF5A45',
     commits: 30,
     files: 166,
+    started: '2026-07-09',
+    updated: '2026-09-09',
   },
   {
     id: 'nextup',
     name: 'NextUp Mentor',
     tagline: 'A study-abroad file that always says who is holding it.',
     summary:
-      'The operating system for a Bangladeshi consultancy placing students in Italy, Lithuania, Hungary and Germany — public booking, a student portal, a staff CRM and an admin surface, with Postgres, not the interface, deciding what each of them can read.',
+      'The operating system for a Bangladeshi consultancy placing students in Italy, Lithuania, Hungary and Germany: public booking, a student portal, a staff CRM and an admin surface, with Postgres, not the interface, deciding what each of them can read.',
     status: 'live',
     year: '2026',
     kind: 'Platform',
@@ -91,13 +99,13 @@ export const projects: Project[] = [
       { value: '4', label: 'user surfaces' },
     ],
     highlights: [
-      'Three separate Supabase clients — public, staff and student — each with its own storage key, so a tutor and a student sharing one browser can never be mistaken for each other.',
+      'Three separate Supabase clients (public, staff and student), each with its own storage key, so a tutor and a student sharing one browser can never be mistaken for each other.',
       'Permission lives in the database. `is_admin()`, `is_staff()` and `current_staff_id()` are SECURITY DEFINER STABLE functions; React decides what renders, Postgres decides what is readable.',
-      'Money is stored in minor units and totals are derived in a view, never stored — two columns that must agree eventually will not.',
+      'Money is stored in minor units and totals are derived in a view, never stored. Two columns that must agree eventually will not.',
       'Receipt fields are copied rather than joined, so a later rename or repricing cannot silently rewrite a document that was already issued.',
     ],
     craft:
-      'The portal refuses to show a number it cannot evidence. Stage events are tagged `recorded` or `inferred`, and only recorded data produces a day count — behind two gates: at least 5 samples, and distinct values covering at least 60% of them. That second gate exists because importing the archive produced 16 samples with only 4 distinct values, bulk-update artifacts that would otherwise have told an anxious student "38 days" on no evidence at all. Sample size is always shown next to the number.',
+      'The portal refuses to show a number it cannot evidence. Stage events are tagged `recorded` or `inferred`, and only recorded data produces a day count. The count sits behind two gates: at least 5 samples, and distinct values covering at least 60% of them. That second gate exists because importing the archive produced 16 samples with only 4 distinct values, bulk-update artifacts that would otherwise have told an anxious student "38 days" on no evidence at all. Sample size is always shown next to the number.',
     honest:
       'Built with an AI pair; commit history credits both. Counts come from the migration set. Placement outcomes and revenue are the consultancy\'s, not a metric I claim.',
     live: 'https://nextupmentor.com',
@@ -109,11 +117,13 @@ export const projects: Project[] = [
     accent: '#35E89B',
     commits: 42,
     files: 228,
+    started: '2026-02-02',
+    updated: '2026-08-24',
   },
   {
     id: 'pixelsub',
     name: 'PixelSub',
-    tagline: 'A shop, a payment rail and an admin panel — all inside Telegram.',
+    tagline: 'A shop, a payment rail and an admin panel, all inside Telegram.',
     summary:
       'A digital-goods storefront that lives entirely in a Telegram chat: crypto checkout through Cryptomus, a store-credit wallet, automatic delivery the moment payment confirms, and a full admin panel the owner runs from their phone. Live as @PixelsubCCBOT.',
     status: 'live',
@@ -130,11 +140,11 @@ export const projects: Project[] = [
     highlights: [
       'Customers browse live stock, pay in USDT, BTC, ETH or TRX, and receive their codes automatically the instant the payment clears.',
       'A wallet system: top up with crypto, or request store credit from the admin and pay from balance.',
-      'The entire back office is Telegram — add products, edit prices, paste stock, ban users, grant credit, approve credit requests, broadcast, read stats. No dashboard required.',
+      'The entire back office is Telegram: add products, edit prices, paste stock, ban users, grant credit, approve credit requests, broadcast, read stats. No dashboard required.',
       'Stock auto-decrements per sale; an optional web dashboard exists for desktop but nothing depends on it.',
     ],
     craft:
-      'Payment confirmation has two independent paths and one hard rule. The Cryptomus webhook makes confirmation instant; a background poller re-checks every pending order in case a webhook is ever missed. But delivery is never triggered by the incoming message — it is gated on a fresh server-to-server status re-check, so a spoofed webhook cannot hand out a single product code.',
+      'Payment confirmation has two independent paths and one hard rule. The Cryptomus webhook makes confirmation instant; a background poller re-checks every pending order in case a webhook is ever missed. But delivery is never triggered by the incoming message. It is gated on a fresh server-to-server status re-check, so a spoofed webhook cannot hand out a single product code.',
     honest:
       'Deployed on Railway with a health check and long polling. Sales volume belongs to the operator; I built and shipped the system.',
     live: 'https://t.me/PixelsubCCBOT',
@@ -143,6 +153,8 @@ export const projects: Project[] = [
     accent: '#5BA8FF',
     commits: 19,
     files: 53,
+    started: '2026-08-09',
+    updated: '2026-09-06',
   },
   {
     id: 'mosjid',
@@ -150,7 +162,7 @@ export const projects: Project[] = [
     nameBn: 'বাংলাদেশের মসজিদ তথ্য ও ডিরেক্টরি',
     tagline: 'Finding a mosque should not require knowing someone.',
     summary:
-      'A nationwide mosque directory for Bangladesh — prayer times, location, facilities and contact for a country with more than 300,000 mosques — built Bangla-first with a real map rather than a list of addresses.',
+      'A nationwide mosque directory for Bangladesh: prayer times, location, facilities and contact for a country with more than 300,000 mosques. Built Bangla-first with a real map rather than a list of addresses.',
     status: 'live',
     year: '2026',
     kind: 'Directory',
@@ -163,12 +175,12 @@ export const projects: Project[] = [
       { value: 'Bangla', label: 'first language' },
     ],
     highlights: [
-      'MapLibre GL over OpenFreeMap tiles — a real vector map, no per-view billing attached to a commercial tile provider.',
+      'MapLibre GL over OpenFreeMap tiles: a real vector map, no per-view billing attached to a commercial tile provider.',
       'Hind Siliguri for Bangla and Inter for Latin, set as a genuine bilingual type system rather than one font stretched over two scripts.',
       'Supabase Postgres with row-level security, auth and storage; submissions from the public go through moderation.',
     ],
     craft:
-      'A national directory is a data problem before it is a UI problem. The schema is built so a mosque can be added by anyone, verified by someone, and located by everyone — with division, district and upazila as first-class fields so the map and the browse tree read from the same source.',
+      'A national directory is a data problem before it is a UI problem. The schema is built so a mosque can be added by anyone, verified by someone, and located by everyone. Division, district and upazila are first-class fields so the map and the browse tree read from the same source.',
     honest:
       '300,000+ is the size of the problem, not a count of rows currently in the database. The platform is live and accepting entries.',
     live: 'https://mosjid.info',
@@ -180,13 +192,15 @@ export const projects: Project[] = [
     accent: '#4FD6C1',
     commits: 14,
     files: 170,
+    started: '2026-08-24',
+    updated: '2026-08-26',
   },
   {
     id: 'tutortrack',
     name: 'TutorTrack',
     tagline: 'Less administration. More room to teach.',
     summary:
-      'An installable, mobile-first platform for private tutors — roster, recurring schedule, homework, attendance, monthly invoicing and reports — with a dedicated student portal on the other side of the same database.',
+      'An installable, mobile-first platform for private tutors (roster, recurring schedule, homework, attendance, monthly invoicing and reports), with a dedicated student portal on the other side of the same database.',
     status: 'live',
     year: '2026',
     kind: 'Platform',
@@ -202,7 +216,7 @@ export const projects: Project[] = [
       'Recurring scheduling generates weekly classes across chosen weekdays; attendance is present / absent / rescheduled / cancelled and stored permanently.',
       'One-click monthly invoice generation with paid, due and overdue states, plus earnings and outstanding reporting.',
       'A student portal showing next class, schedule, homework, attendance percentage, teacher notes and fee history.',
-      'Server Actions are the API layer — a deliberate call to ship one full-stack app instead of operating a separate service.',
+      'Server Actions are the API layer, a deliberate call to ship one full-stack app instead of operating a separate service.',
     ],
     craft:
       'Built as a mobile-first installable PWA so one codebase serves web, Android and iOS through add-to-home-screen, rather than paying the cost of a native wrapper for a product whose entire job is a tutor checking a schedule between classes.',
@@ -217,13 +231,15 @@ export const projects: Project[] = [
     accent: '#B388FF',
     commits: 10,
     files: 99,
+    started: '2026-06-21',
+    updated: '2026-06-22',
   },
   {
     id: 'hikmah',
     name: 'Hikmah Tutors',
     tagline: 'Tuition media, tracked from posting to collection.',
     summary:
-      'A tuition media platform for Rajshahi. Guardians post requirements, tutors apply, Hikmah shortlists and places — and the media fee is followed all the way to collection instead of being remembered by hand.',
+      'A tuition media platform for Rajshahi. Guardians post requirements, tutors apply, Hikmah shortlists and places. The media fee is followed all the way to collection instead of being remembered by hand.',
     status: 'live',
     year: '2026',
     kind: 'Platform',
@@ -235,7 +251,7 @@ export const projects: Project[] = [
       { value: '2', label: 'storage tiers' },
     ],
     highlights: [
-      'FastAPI + asyncpg straight onto Supabase Postgres in ap-south-1 — the region nearest the people using it.',
+      'FastAPI + asyncpg straight onto Supabase Postgres in ap-south-1, the region nearest the people using it.',
       'Two storage tiers by design: public avatars, private identity documents. A tutor\'s NID is not a profile picture.',
       'Bangla-first React front end on shadcn/ui.',
     ],
@@ -250,6 +266,8 @@ export const projects: Project[] = [
     accent: '#FFB454',
     commits: 17,
     files: 196,
+    started: '2026-04-13',
+    updated: '2026-08-27',
   },
   {
     id: 'ipiguard',
@@ -268,7 +286,7 @@ export const projects: Project[] = [
       { value: 'gated', label: 'tool execution' },
     ],
     highlights: [
-      'Treats the inbox as untrusted input to a tool-using agent — the actual threat surface, not a hypothetical one.',
+      'Treats the inbox as untrusted input to a tool-using agent: the actual threat surface, not a hypothetical one.',
       'Emits a calibrated confidence score rather than a bare label, so a downstream policy can choose its own threshold.',
       'Sensitive tool calls run in a sandboxed simulation gated on that score.',
     ],
@@ -280,13 +298,15 @@ export const projects: Project[] = [
     accent: '#FF5A45',
     commits: 2,
     files: 82,
+    started: '2026-08-30',
+    updated: '2026-08-30',
   },
   {
     id: 'soundai',
     name: 'SOUND-AI',
     tagline: 'When the shape of a song decides which words matter.',
     summary:
-      'A neural architecture that predicts the musical context of a clip by fusing two views of the same piece — a graph neural network over a music-structure graph built from the audio, and BERT over the text describing it — joined with cross-attention.',
+      'A neural architecture that predicts the musical context of a clip by fusing two views of the same piece: a graph neural network over a music-structure graph built from the audio, and BERT over the text describing it. The two are joined with cross-attention.',
     status: 'research',
     year: '2026',
     kind: 'Research',
@@ -303,20 +323,22 @@ export const projects: Project[] = [
       'Graph, text and audio baselines compared under the same conditions, with ablations.',
     ],
     craft:
-      'The hard part was not the architecture, it was making the comparison honest — preventing artist overlap and label leakage between training and evaluation, so an improvement is an improvement and not a memorised split.',
+      'The hard part was not the architecture, it was making the comparison honest: preventing artist overlap and label leakage between training and evaluation, so an improvement is an improvement and not a memorised split.',
     honest:
-      'A university course project with multiple credited authors. The published results run on a small synthetic development corpus — smoke tests, not benchmark performance, and the README says exactly that.',
+      'A university course project with multiple credited authors. The published results run on a small synthetic development corpus. They are smoke tests, not benchmark performance, and the README says exactly that.',
     repo: 'https://github.com/workmail1803-ai/SOUND-AI',
     accent: '#B388FF',
-    commits: 8,
-    files: 60,
+    commits: 4,
+    files: 158,
+    started: '2026-09-05',
+    updated: '2026-09-08',
   },
   {
     id: 'quickbook',
     name: 'Railway QuickBook',
     tagline: 'Removing reaction time. Not jumping the queue.',
     summary:
-      'A Manifest V3 Chrome extension that prepares a Bangladesh Railway booking before the 08:00 Asia/Dhaka sales window opens, then drives the site\'s normal flow the moment it does — and stops with the seats selected so a human commits the purchase.',
+      'A Manifest V3 Chrome extension that prepares a Bangladesh Railway booking before the 08:00 Asia/Dhaka sales window opens, then drives the site\'s normal flow the moment it does. It stops with the seats selected so a human commits the purchase.',
     status: 'shipped',
     year: '2026',
     kind: 'Automation',
@@ -328,7 +350,7 @@ export const projects: Project[] = [
       { value: 'stops', label: 'before payment' },
     ],
     highlights: [
-      'Search, train, class and seat map are driven through the site\'s own booking flow — no private API, no forged request.',
+      'Search, train, class and seat map are driven through the site\'s own booking flow: no private API, no forged request.',
       'Written for a single legitimate account and the ticket limit that account already has.',
       'Halts with seats selected. A person makes the purchase.',
     ],
@@ -339,20 +361,22 @@ export const projects: Project[] = [
     accent: '#5BA8FF',
     commits: 9,
     files: 53,
+    started: '2026-08-19',
+    updated: '2026-09-06',
   },
   {
     id: 'nazmul',
     name: 'Nazmul Commerce',
     tagline: 'The cart total is a SQL function, not a React variable.',
     summary:
-      'A Bangladesh electronics storefront and admin — Next.js 16 on Supabase Postgres 17 — where pricing is computed in the database and the client is never trusted to submit a number.',
+      'A Bangladesh electronics storefront and admin (Next.js 16 on Supabase Postgres 17), where pricing is computed in the database and the client is never trusted to submit a number.',
     status: 'prototype',
     year: '2026',
     kind: 'Commerce',
     scale: 'minor',
     stack: ['Next.js 16', 'TypeScript', 'Tailwind v4', 'Supabase', 'Postgres 17', 'Vitest'],
     metrics: [
-      { value: '256', label: 'files' },
+      { value: '313', label: 'files' },
       { value: '1', label: 'source of price truth' },
     ],
     highlights: [
@@ -361,19 +385,21 @@ export const projects: Project[] = [
       'RLS is the security boundary. Middleware redirects are UX, not authorization.',
     ],
     craft:
-      'Two rules were written down before the first component: money is computed in Postgres, and `is_staff()` / `has_role()` are SECURITY DEFINER helpers reading a roles table — never a client-supplied claim. Everything else in the codebase follows from those.',
+      'Two rules were written down before the first component: money is computed in Postgres, and `is_staff()` / `has_role()` are SECURITY DEFINER helpers reading a roles table, never a client-supplied claim. Everything else in the codebase follows from those.',
     honest: 'In active development. Not yet deployed to a live storefront.',
     repo: 'https://github.com/workmail1803-ai/ECOM',
     accent: '#FFB454',
-    commits: 4,
-    files: 256,
+    commits: 26,
+    files: 313,
+    started: '2026-09-08',
+    updated: '2026-09-16',
   },
   {
     id: 'shortlink',
     name: 'Shortlink',
     tagline: 'A 301 that keeps the preview and the attribution intact.',
     summary:
-      'A self-hosted short-link service built for paid social — instant redirects, no interstitial, and Open Graph tags copied from the destination so a shared link previews as the real landing page.',
+      'A self-hosted short-link service built for paid social: instant redirects, no interstitial, and Open Graph tags copied from the destination so a shared link previews as the real landing page.',
     status: 'shipped',
     year: '2026',
     kind: 'Automation',
@@ -393,8 +419,10 @@ export const projects: Project[] = [
     honest: 'Runs on Vercel, a VPS or Docker. Built for a specific advertising workflow.',
     repo: 'https://github.com/workmail1803-ai/URL_SHORTENER',
     accent: '#4FD6C1',
-    commits: 12,
-    files: 70,
+    commits: 10,
+    files: 87,
+    started: '2026-08-14',
+    updated: '2026-08-15',
   },
 ];
 
@@ -416,28 +444,28 @@ export const principles = [
     n: '01',
     title: 'The database decides.',
     body: 'Row-level security is the boundary. React chooses what renders; Postgres chooses what is readable. A hidden button is not a permission.',
-    proof: 'NextUp Mentor — 66 policies across 21 tables',
+    proof: 'NextUp Mentor: 66 policies across 21 tables',
     href: 'https://github.com/workmail1803-ai/Nextup',
   },
   {
     n: '02',
     title: 'Never show a number you cannot evidence.',
     body: 'Inferred data is labelled inferred. Averages are gated on sample size and distinctness, and the sample size ships next to the number.',
-    proof: 'NextUp portal — n ≥ 5, distinct ≥ 60%',
+    proof: 'NextUp portal: n ≥ 5, distinct ≥ 60%',
     href: 'https://github.com/workmail1803-ai/Nextup',
   },
   {
     n: '03',
     title: 'Measure, then move the bottleneck.',
     body: 'A per-request database round-trip became a pre-rendered page, and the measurement itself moved off the render path.',
-    proof: 'All Bangla Paper — 478ms → ~16ms',
+    proof: 'All Bangla Paper: 478ms → ~16ms',
     href: 'https://www.allbanglapaper.com',
   },
   {
     n: '04',
     title: 'Trust the re-check, not the message.',
     body: 'An incoming webhook is a hint that something may have happened. Delivery is gated on asking the payment provider directly.',
-    proof: 'PixelSub — server-to-server confirmation',
+    proof: 'PixelSub: server-to-server confirmation',
     href: 'https://t.me/PixelsubCCBOT',
   },
   {
